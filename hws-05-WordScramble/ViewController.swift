@@ -21,6 +21,8 @@ class ViewController: UITableViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(promptForAnswer))
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(startGame))
+        
         // Find the game data and load it from the text file into an array
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
@@ -48,7 +50,7 @@ class ViewController: UITableViewController {
     }
     
     // MARK: - Game functions
-    func startGame() {
+    @objc func startGame() {
         // Pick a word at random to begin the game
         title = allWords.randomElement()
         
@@ -112,9 +114,7 @@ class ViewController: UITableViewController {
         }
         
         // Display error message as alert
-        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-        present(ac, animated: true)
+        showErrorMessage(title: errorTitle, message: errorMessage)
     }
     
     // Check submitted word is possible from available letters
@@ -145,6 +145,13 @@ class ViewController: UITableViewController {
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+    }
+    
+    // Display error messages
+    func showErrorMessage(title errorTitle: String, message errorMessage: String) {
+        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        present(ac, animated: true)
     }
 }
 
