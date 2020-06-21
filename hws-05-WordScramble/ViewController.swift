@@ -78,56 +78,40 @@ class ViewController: UITableViewController {
     func submit(_ answer: String) {
         let lowerAnswer = answer.lowercased()
         
-        let errorTitle: String
-        let errorMessage: String
+        if !isPossible(word: lowerAnswer) {
+            labelError("notPossible")
+            return
+        }
         
-        if isPossible(word: lowerAnswer) {
-            
-            if isOriginal(word: lowerAnswer) {
-                
-                if isLongEnough(word: lowerAnswer) {
-                    
-                    if isNotTitle(word: lowerAnswer) {
-                        
-                        if isReal(word: lowerAnswer) {
-                            
-                            // Add the word to usedWords array
-                            usedWords.insert(lowerAnswer, at: 0)
-                            
-                            // Animate display of new word at top of table view
-                            let indexPath = IndexPath(row: 0, section: 0)
-                            tableView.insertRows(at: [indexPath], with: .automatic)
-                            
-                            return
-                        }
-                        else {
-                            errorTitle = "Not a recognized English word"
-                            errorMessage = "You can't just make them up!"
-                        }
-                    }
-                    else {
-                        errorTitle = "Must differ from start word"
-                        errorMessage = "Don't be a copycat!"
-                    }
-                }
-                else {
-                    errorTitle = "Must be at least three characters"
-                    errorMessage = "Arbitrary rule!"
-                }
-            }
-            else {
-                errorTitle = "Word already used"
-                errorMessage = "Be original!"
-            }
+        if !isOriginal(word: lowerAnswer) {
+            labelError("notOriginal")
+            return
+        }
+        
+        if !isLongEnough(word: lowerAnswer) {
+            labelError("notLongEnough")
+            return
+        }
+        
+        if !isNotTitle(word: lowerAnswer) {
+            labelError("isTitle")
+            return
+        }
+        
+        if !isReal(word: lowerAnswer) {
+            labelError("notReal")
+            return
         }
         else {
-            guard let title = title?.lowercased() else { return }
-            errorTitle = "Word not possible with available letters"
-            errorMessage = "You can't spell \(lowerAnswer) from \(title)"
+            // Add the word to usedWords array
+            usedWords.insert(lowerAnswer, at: 0)
+            
+            // Animate display of new word at top of table view
+            let indexPath = IndexPath(row: 0, section: 0)
+            tableView.insertRows(at: [indexPath], with: .automatic)
+            
+            return
         }
-        
-        // Display error message as alert
-        showErrorMessage(title: errorTitle, message: errorMessage)
     }
     
     // MARK: - Error handling
@@ -184,6 +168,43 @@ class ViewController: UITableViewController {
         else {
             return true
         }
+    }
+    
+    // Assign titles and messages to error conditions
+    func labelError(_ error: String, _ lowerAnswer: String? = nil) {
+        
+        let errorTitle: String
+        let errorMessage: String
+
+        switch error {
+            
+        case "notPossible":
+            guard let title = title?.lowercased() else { return }
+            errorTitle = "Word not possible with available letters"
+            errorMessage = "You can't spell \(lowerAnswer ?? "") from \(title)"
+            
+        case "notOriginal":
+            errorTitle = "Word already used"
+            errorMessage = "Be original!"
+            
+        case "notLongEnough":
+            errorTitle = "Must be at least three characters"
+            errorMessage = "Arbitrary rule!"
+            
+        case "isTitle":
+            errorTitle = "Must differ from start word"
+            errorMessage = "Don't be a copycat!"
+            
+        case "notReal":
+            errorTitle = "Not a recognized English word"
+            errorMessage = "You can't just make them up!"
+            
+        default:
+            errorTitle = "Something is wrong"
+            errorMessage = "Should never reach default case!"
+        }
+        
+        showErrorMessage(title: errorTitle, message: errorMessage)
     }
     
     // Display error messages
