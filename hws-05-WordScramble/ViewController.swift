@@ -49,7 +49,7 @@ class ViewController: UITableViewController {
         return cell
     }
     
-    // MARK: - Game functions
+    // MARK: - Game logic
     @objc func startGame() {
         // Pick a word at random to begin the game
         title = allWords.randomElement()
@@ -92,7 +92,7 @@ class ViewController: UITableViewController {
                         if isReal(word: lowerAnswer) {
                             
                             // Add the word to usedWords array
-                            usedWords.insert(answer, at: 0)
+                            usedWords.insert(lowerAnswer, at: 0)
                             
                             // Animate display of new word at top of table view
                             let indexPath = IndexPath(row: 0, section: 0)
@@ -129,6 +129,8 @@ class ViewController: UITableViewController {
         // Display error message as alert
         showErrorMessage(title: errorTitle, message: errorMessage)
     }
+    
+    // MARK: - Error handling
     
     // Check submitted word is possible from available letters
     func isPossible(word: String) -> Bool {
