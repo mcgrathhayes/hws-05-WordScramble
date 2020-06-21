@@ -75,7 +75,6 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
     
-    
     func submit(_ answer: String) {
         let lowerAnswer = answer.lowercased()
         
@@ -83,23 +82,37 @@ class ViewController: UITableViewController {
         let errorMessage: String
         
         if isPossible(word: lowerAnswer) {
-        
+            
             if isOriginal(word: lowerAnswer) {
-        
-                if isReal(word: lowerAnswer) {
-        
-                    // Add the word to usedWords array
-                    usedWords.insert(answer, at: 0)
-        
-                    // Animate display of new word at top of table view
-                    let indexPath = IndexPath(row: 0, section: 0)
-                    tableView.insertRows(at: [indexPath], with: .automatic)
+                
+                if isLongEnough(word: lowerAnswer) {
                     
-                    return
+                    if isNotTitle(word: lowerAnswer) {
+                        
+                        if isReal(word: lowerAnswer) {
+                            
+                            // Add the word to usedWords array
+                            usedWords.insert(answer, at: 0)
+                            
+                            // Animate display of new word at top of table view
+                            let indexPath = IndexPath(row: 0, section: 0)
+                            tableView.insertRows(at: [indexPath], with: .automatic)
+                            
+                            return
+                        }
+                        else {
+                            errorTitle = "Not a recognized English word"
+                            errorMessage = "You can't just make them up!"
+                        }
+                    }
+                    else {
+                        errorTitle = "Must differ from start word"
+                        errorMessage = "Don't be a copycat!"
+                    }
                 }
                 else {
-                    errorTitle = "Not a recognized English word"
-                    errorMessage = "You can't just make them up!"
+                    errorTitle = "Must be at least three characters"
+                    errorMessage = "Arbitrary rule!"
                 }
             }
             else {
@@ -140,11 +153,35 @@ class ViewController: UITableViewController {
     
     // Check that word is valid English
     func isReal(word: String) -> Bool {
+        if word.count < 3 { return false }
+        
+        if word == title { return false }
+        
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+    }
+    
+    // Check that word is at least three characters
+    func isLongEnough(word: String) -> Bool {
+        if word.count < 3 {
+            return false
+        }
+        else {
+            return true
+        }
+    }
+    
+    // Check that word is not title
+    func isNotTitle(word: String) -> Bool {
+        if word == title {
+            return false
+        }
+        else {
+            return true
+        }
     }
     
     // Display error messages
