@@ -73,9 +73,78 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
     
+    
     func submit(_ answer: String) {
+        let lowerAnswer = answer.lowercased()
         
+        let errorTitle: String
+        let errorMessage: String
+        
+        if isPossible(word: lowerAnswer) {
+        
+            if isOriginal(word: lowerAnswer) {
+        
+                if isReal(word: lowerAnswer) {
+        
+                    // Add the word to usedWords array
+                    usedWords.insert(answer, at: 0)
+        
+                    // Animate display of new word at top of table view
+                    let indexPath = IndexPath(row: 0, section: 0)
+                    tableView.insertRows(at: [indexPath], with: .automatic)
+                    
+                    return
+                }
+                else {
+                    errorTitle = "Not a recognized English word"
+                    errorMessage = "You can't just make them up!"
+                }
+            }
+            else {
+                errorTitle = "Word already used"
+                errorMessage = "Be original!"
+            }
+        }
+        else {
+            guard let title = title?.lowercased() else { return }
+            errorTitle = "Word not possible with available letters"
+            errorMessage = "You can't spell \(lowerAnswer) from \(title)"
+        }
+        
+        // Display error message as alert
+        let ac = UIAlertController(title: errorTitle, message: errorMessage, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        present(ac, animated: true)
     }
-
+    
+    // Check submitted word is possible from available letters
+    func isPossible(word: String) -> Bool {
+        guard var tempWord = title?.lowercased() else { return false }
+        
+        for letter in word {
+            if let position = tempWord.firstIndex(of: letter) {
+                tempWord.remove(at: position)
+            }
+            else {
+                return false
+            }
+        }
+        
+        return true
+    }
+    
+    // Check for duplicate word
+    func isOriginal(word: String) -> Bool {
+        return !usedWords.contains(word)
+    }
+    
+    // Check that word is valid English
+    func isReal(word: String) -> Bool {
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        
+        return misspelledRange.location == NSNotFound
+    }
 }
 
